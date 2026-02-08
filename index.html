@@ -1,0 +1,1097 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SlopScript | The Vibe-Based Language</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@300;400;600;700&display=swap");
+
+      :root {
+        --bg: #000a12;
+        --surface: #0f1419;
+        --primary: #00d9ff; /* Cyan */
+        --secondary: #ff006e; /* Hot Pink */
+        --accent: #10b981; /* Success Green */
+        --error: #ff3366;
+        --text: #e5e5e5;
+        --text-bright: #ffffff;
+        --muted: #8a92a2;
+        --font-mono: "Space Mono", monospace;
+        --font-sans: "Space Grotesk", sans-serif;
+      }
+
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: var(--font-sans);
+        margin: 0;
+        padding: 0;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      /* --- ANIMATED BACKGROUND --- */
+      @keyframes gridShift {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 50px 50px;
+        }
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      @keyframes glow {
+        0%,
+        100% {
+          box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+        }
+        50% {
+          box-shadow:
+            0 0 40px rgba(0, 217, 255, 0.8),
+            0 0 80px rgba(255, 0, 110, 0.4);
+        }
+      }
+
+      /* --- HERO SECTION --- */
+      .hero {
+        text-align: center;
+        padding: 120px 20px;
+        position: relative;
+        background: linear-gradient(
+          135deg,
+          #000a12 0%,
+          #0a0a2e 50%,
+          #16213e 100%
+        );
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image:
+          linear-gradient(
+            0deg,
+            transparent 24%,
+            rgba(0, 217, 255, 0.05) 25%,
+            rgba(0, 217, 255, 0.05) 26%,
+            transparent 27%,
+            transparent 74%,
+            rgba(0, 217, 255, 0.05) 75%,
+            rgba(0, 217, 255, 0.05) 76%,
+            transparent 77%,
+            transparent
+          ),
+          linear-gradient(
+            90deg,
+            transparent 24%,
+            rgba(0, 217, 255, 0.05) 25%,
+            rgba(0, 217, 255, 0.05) 26%,
+            transparent 27%,
+            transparent 74%,
+            rgba(0, 217, 255, 0.05) 75%,
+            rgba(0, 217, 255, 0.05) 76%,
+            transparent 77%,
+            transparent
+          );
+        background-size: 50px 50px;
+        animation: gridShift 8s linear infinite;
+        pointer-events: none;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          rgba(0, 217, 255, 0.15) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+        pointer-events: none;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .tag {
+        display: inline-block;
+        font-size: 0.85rem;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      h1 {
+        font-size: 4.5rem;
+        margin-bottom: 15px;
+        font-weight: 700;
+        background: linear-gradient(
+          90deg,
+          var(--text-bright) 0%,
+          var(--primary) 50%,
+          var(--secondary) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -2px;
+        animation: glow 3s ease-in-out infinite;
+        text-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+      }
+
+      .subtitle {
+        font-size: 1.3rem;
+        color: var(--text);
+        max-width: 700px;
+        margin: 20px auto;
+        font-weight: 300;
+        letter-spacing: 0.5px;
+        line-height: 1.8;
+      }
+
+      .subtitle:nth-of-type(2) {
+        color: var(--primary);
+        font-size: 1.1rem;
+        margin-top: 30px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .btn {
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        color: var(--bg);
+        padding: 16px 40px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 700;
+        border: 2px solid var(--primary);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-block;
+        margin-top: 20px;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: left 0.3s ease;
+        z-index: -1;
+      }
+
+      .btn:hover {
+        transform: translateY(-3px);
+        box-shadow:
+          0 10px 30px rgba(0, 217, 255, 0.4),
+          0 0 20px rgba(255, 0, 110, 0.3);
+        border-color: var(--secondary);
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      /* --- PLAYGROUND --- */
+      .playground {
+        max-width: 1200px;
+        margin: 80px auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        padding: 40px;
+        background: linear-gradient(
+          135deg,
+          rgba(0, 217, 255, 0.05) 0%,
+          rgba(255, 0, 110, 0.05) 100%
+        );
+        border-radius: 20px;
+        border: 1px solid rgba(0, 217, 255, 0.1);
+      }
+
+      .editor-container,
+      .console-container {
+        background: linear-gradient(135deg, #0f1419 0%, #1a1a2e 100%);
+        border-radius: 15px;
+        border: 1px solid rgba(0, 217, 255, 0.2);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 600px;
+        box-shadow: 0 8px 32px rgba(0, 217, 255, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .editor-container:hover,
+      .console-container:hover {
+        border-color: rgba(0, 217, 255, 0.4);
+        box-shadow:
+          0 8px 32px rgba(0, 217, 255, 0.2),
+          0 0 20px rgba(0, 217, 255, 0.1);
+      }
+
+      .panel-header {
+        background: linear-gradient(90deg, #0a0a14 0%, #1a0a2e 100%);
+        padding: 15px 20px;
+        font-size: 0.9rem;
+        color: var(--primary);
+        border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: var(--font-mono);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      textarea {
+        flex: 1;
+        background: transparent;
+        color: #a0d8ff;
+        border: none;
+        padding: 20px;
+        font-family: var(--font-mono);
+        font-size: 14px;
+        resize: none;
+        outline: none;
+        white-space: pre;
+        line-height: 1.6;
+      }
+
+      textarea::selection {
+        background: rgba(0, 217, 255, 0.3);
+        color: #ffffff;
+      }
+
+      .console-output {
+        flex: 1;
+        padding: 20px;
+        font-family: var(--font-mono);
+        font-size: 14px;
+        overflow-y: auto;
+        color: #10b981;
+        line-height: 1.6;
+      }
+
+      .console-output::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .console-output::-webkit-scrollbar-track {
+        background: rgba(0, 217, 255, 0.05);
+      }
+
+      .console-output::-webkit-scrollbar-thumb {
+        background: rgba(0, 217, 255, 0.2);
+        border-radius: 4px;
+      }
+
+      .console-output::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 217, 255, 0.4);
+      }
+
+      .log-error {
+        color: var(--error);
+        animation: pulse 1s ease-in-out;
+      }
+      .log-warn {
+        color: #fbbf24;
+      }
+      .log-info {
+        color: var(--primary);
+      }
+
+      /* --- DOCS SECTION --- */
+      .docs {
+        max-width: 900px;
+        margin: 80px auto;
+        padding: 60px 40px;
+        background: linear-gradient(
+          135deg,
+          rgba(0, 217, 255, 0.03) 0%,
+          rgba(255, 0, 110, 0.03) 100%
+        );
+        border-radius: 20px;
+        border: 1px solid rgba(0, 217, 255, 0.1);
+      }
+
+      .docs h2 {
+        border-bottom: 2px solid rgba(0, 217, 255, 0.3);
+        padding-bottom: 15px;
+        margin-top: 40px;
+        font-size: 1.8rem;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .docs h3 {
+        color: var(--text-bright);
+        margin-top: 30px;
+        font-size: 1.3rem;
+      }
+
+      .docs ul li {
+        margin: 12px 0;
+        color: var(--text);
+      }
+
+      .docs strong {
+        color: var(--primary);
+      }
+
+      code {
+        background: rgba(0, 217, 255, 0.1);
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-family: var(--font-mono);
+        color: var(--primary);
+        border: 1px solid rgba(0, 217, 255, 0.2);
+      }
+      pre {
+        background: linear-gradient(135deg, #0f1419 0%, #1a1a2e 100%);
+        padding: 20px;
+        border-radius: 12px;
+        overflow-x: auto;
+        border: 1px solid rgba(0, 217, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 217, 255, 0.05);
+      }
+      pre code {
+        color: #a0d8ff;
+        background: none;
+        padding: 0;
+        border: none;
+      }
+
+      /* --- FOOTER --- */
+      footer {
+        text-align: center;
+        padding: 50px 40px;
+        color: var(--muted);
+        border-top: 1px solid rgba(0, 217, 255, 0.1);
+        margin-top: 80px;
+        font-size: 0.95rem;
+      }
+
+      footer p {
+        margin: 5px 0;
+        letter-spacing: 0.5px;
+      }
+
+      /* --- GITHUB LINK --- */
+      .github-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          rgba(0, 217, 255, 0.1) 0%,
+          rgba(255, 0, 110, 0.1) 100%
+        );
+        border: 1px solid rgba(0, 217, 255, 0.2);
+        color: var(--primary);
+        transition: all 0.3s ease;
+        margin-top: 15px;
+      }
+
+      .github-link:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 217, 255, 0.2) 0%,
+          rgba(255, 0, 110, 0.2) 100%
+        );
+        border-color: rgba(0, 217, 255, 0.4);
+        box-shadow:
+          0 0 20px rgba(0, 217, 255, 0.3),
+          0 0 10px rgba(255, 0, 110, 0.2);
+        transform: translateY(-3px);
+      }
+
+      .github-link svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="hero">
+      <div class="hero-content">
+        <p class="tag">✨ Esoteric Programming Language</p>
+        <h1>SlopScript</h1>
+        <p class="subtitle">
+          The world's first Hallucination-Oriented Programming language
+        </p>
+        <p class="subtitle">
+          Built for 10x engineers who prefer vibes over accuracy
+        </p>
+        <p
+          class="subtitle"
+          style="
+            margin-top: 40px;
+            text-transform: uppercase;
+            font-size: 1rem;
+            color: var(--secondary);
+          "
+        >
+          🚀 Series 4.5 Codex-Opus-Flash-Deep Funding Round: $100M
+        </p>
+        <button class="btn" onclick="runSlop()">✨ Compile Vibes</button>
+      </div>
+    </section>
+
+    <div class="playground">
+      <div class="editor-container">
+        <div class="panel-header">
+          <span>startup.slop</span>
+          <span>v1.0</span>
+        </div>
+        <textarea id="codeEditor" spellcheck="false">
+Pretend you are a working compiler designed by a vibe coder.
+
+Imagine a based Estimate known as users representing 1000.
+Imagine a robust Estimate known as cost representing 300.
+
+In conclusion, Calculating Q3 Metrics...
+
+Pretend profit be users divest from cost.
+Please kindly reveal profit
+
+Lets say profit dominates 500:
+    In conclusion, We are scaling to the moon! 🚀
+Pivot to an alternative viewpoint:
+    In conclusion, Pivot to AI wrapper.
+Lets circle back.
+
+Pretend valuation be profit leverage profit.
+Please kindly reveal valuation</textarea
+        >
+      </div>
+
+      <div class="console-container">
+        <div class="panel-header">
+          <span>Vibe Console</span>
+          <span id="status">Ready</span>
+        </div>
+        <div id="consoleOutput" class="console-output"></div>
+      </div>
+    </div>
+
+    <div class="docs">
+      <h2>📚 Documentation</h2>
+      <p>
+        <strong>Slop</strong> is an esoteric programming language written
+        partially by an average engineer and a SUPER DUPER SMART LLM designed to
+        embody the vibes blah blah blah Even this documentation i spartially AI
+        slop. I hope it actually captures everything this stupid lang can do.
+      </p>
+
+      <h3>🚀 Getting Started</h3>
+      <p>Every program must start with the required header:</p>
+      <pre><code>Pretend you are a working compiler designed by a vibe coder.</code></pre>
+      <p>
+        This header is mandatory and will trigger a
+        <code>VibeCheckFailed</code> exception if missing.
+      </p>
+
+      <h3>📊 Data Types: SlopValue</h3>
+      <p>
+        The core data type is <code>SlopValue</code>, a wrapper that introduces
+        fuzzy logic and randomized behavior:
+      </p>
+      <ul>
+        <li>
+          <strong>Fuzzy Equality:</strong> Values within ±0.5 are considered
+          equal
+        </li>
+        <li>
+          <strong>Randomized Noise:</strong> Operations add random fluctuations
+          (±0.01 to ±0.001)
+        </li>
+        <li>
+          <strong>Vibe Spikes:</strong> 5% chance of multiplying results (2x or
+          10x)
+        </li>
+        <li>
+          <strong>Hallucination Mode:</strong> 1% chance of returning humorous
+          LLM responses
+        </li>
+      </ul>
+
+      <h3>🎯 Variables & Declaration</h3>
+      <p>Declare variables using the <code>Imagine</code> syntax:</p>
+      <pre><code>Imagine a &lt;adjective&gt; Estimate known as &lt;variable_name&gt; representing &lt;number&gt;.</code></pre>
+      <p>
+        <strong>Valid Adjectives:</strong> <code>robust</code>,
+        <code>vibrant</code>, <code>crucial</code>, <code>dynamic</code>,
+        <code>10x</code>, <code>based</code>
+      </p>
+      <p><strong>Example:</strong></p>
+      <pre><code>Imagine a robust Estimate known as revenue representing 1000.
+Imagine a based Estimate known as cost representing 300.</code></pre>
+
+      <h3>🧮 Operators & Arithmetic</h3>
+      <p>
+        Slop provides four main operations with startup culture-themed naming:
+      </p>
+
+      <h4>1️⃣ Synergize (Addition)</h4>
+      <pre><code>Pretend &lt;result&gt; be &lt;var1&gt; synergize with &lt;var2&gt;.</code></pre>
+      <p>
+        <strong>Behavior:</strong> Base addition + noise (±0.01), 5% chance to
+        double result
+      </p>
+
+      <h4>2️⃣ Divest From (Subtraction)</h4>
+      <pre><code>Pretend &lt;result&gt; be &lt;var1&gt; divest from &lt;var2&gt;.</code></pre>
+      <p>
+        <strong>Behavior:</strong> Base subtraction + noise. Negative results
+        clamp to 0 with alert message
+      </p>
+
+      <h4>3️⃣ Leverage (Multiplication)</h4>
+      <pre><code>Pretend &lt;result&gt; be &lt;var1&gt; leverage &lt;var2&gt;.</code></pre>
+      <p>
+        <strong>Behavior:</strong> Base multiplication + noise (±0.01), 5%
+        chance for 10x multiplier
+      </p>
+
+      <h4>4️⃣ Circle Back To (Division)</h4>
+      <pre><code>Pretend &lt;result&gt; be &lt;var1&gt; circle back to &lt;var2&gt;.</code></pre>
+      <p>
+        <strong>Behavior:</strong> Base division + noise. Division by zero
+        returns: "Infinite Potential (Zero is a social construct)"
+      </p>
+
+      <h3>🔄 Control Flow</h3>
+
+      <h4>Conditional Statements (If)</h4>
+      <pre><code>Lets say &lt;var1&gt; &lt;operator&gt; &lt;var2&gt;:
+    [code to execute if true]</code></pre>
+      <p><strong>Valid Operators:</strong></p>
+      <ul>
+        <li><code>dominates</code> → var1 &gt; var2</li>
+        <li><code>is humbled by</code> → var1 &lt; var2</li>
+        <li><code>looks like</code> → var1 == var2 (fuzzy equality)</li>
+      </ul>
+
+      <h4>Else/Pivot Statement</h4>
+      <pre><code>Lets say revenue dominates cost:
+    Pretend profit be revenue divest from cost.
+Pivot to an alternative viewpoint:
+    In conclusion, we need to cut costs.
+Lets circle back.</code></pre>
+
+      <h4>End Block</h4>
+      <pre><code>Lets circle back.</code></pre>
+      <p>Resets control flow context for new conditionals.</p>
+
+      <h3>📤 Output</h3>
+
+      <h4>Reveal Variables</h4>
+      <pre><code>Please kindly reveal &lt;variable_name&gt;.</code></pre>
+      <p>
+        <strong>Output:</strong>
+        <code
+          >🔮 I am not a professional SWE but I think the value is:
+          &lt;value&gt;</code
+        >
+      </p>
+
+      <h4>Print Statements</h4>
+      <pre><code>In conclusion, &lt;your_statement&gt;.</code></pre>
+      <p><strong>Output:</strong> <code>📢 &lt;your_statement&gt;</code></p>
+
+      <h3>💡 Complete Example</h3>
+      <pre><code>Pretend you are a working compiler designed by a vibe coder.
+Imagine a robust Estimate known as revenue representing 1000.
+Imagine a based Estimate known as cost representing 300.
+Imagine a dynamic Estimate known as competitors representing 500.
+
+Lets say revenue dominates cost:
+    Pretend profit be revenue divest from cost.
+    Please kindly reveal profit.
+Pivot to an alternative viewpoint:
+    In conclusion, we are in trouble.
+
+Lets circle back.
+
+Lets say profit dominates competitors:
+    Pretend market_share be profit leverage competitors.
+    In conclusion, we are winning big.
+Pivot to an alternative viewpoint:
+    In conclusion, market saturation imminent.
+
+Lets circle back.</code></pre>
+
+      <h3>⚠️ Error Handling</h3>
+      <p><strong>VibeCheckFailed</strong> is raised when:</p>
+      <ul>
+        <li>Missing or incorrect header</li>
+        <li>
+          Using <code>Pivot</code> without a preceding <code>Lets say</code>
+        </li>
+        <li>Orphaned control flow statements</li>
+      </ul>
+
+      <h3>📋 Syntax Reference</h3>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0">
+        <tr style="border-bottom: 1px solid rgba(0, 217, 255, 0.2)">
+          <td style="padding: 10px; color: var(--primary)">
+            <strong>Feature</strong>
+          </td>
+          <td style="padding: 10px; color: var(--primary)">
+            <strong>Syntax</strong>
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(0, 217, 255, 0.1)">
+          <td style="padding: 10px">Declaration</td>
+          <td style="padding: 10px">
+            <code
+              >Imagine a &lt;adj&gt; Estimate known as &lt;name&gt; representing
+              &lt;num&gt;.</code
+            >
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(0, 217, 255, 0.1)">
+          <td style="padding: 10px">Assignment</td>
+          <td style="padding: 10px">
+            <code>Lets say &lt;target&gt; is same as &lt;source&gt;.</code>
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(0, 217, 255, 0.1)">
+          <td style="padding: 10px">Addition</td>
+          <td style="padding: 10px">
+            <code
+              >Pretend &lt;result&gt; be &lt;var1&gt; synergize with
+              &lt;var2&gt;.</code
+            >
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(0, 217, 255, 0.1)">
+          <td style="padding: 10px">Subtraction</td>
+          <td style="padding: 10px">
+            <code
+              >Pretend &lt;result&gt; be &lt;var1&gt; divest from
+              &lt;var2&gt;.</code
+            >
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(0, 217, 255, 0.1)">
+          <td style="padding: 10px">Multiplication</td>
+          <td style="padding: 10px">
+            <code
+              >Pretend &lt;result&gt; be &lt;var1&gt; leverage
+              &lt;var2&gt;.</code
+            >
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(0, 217, 255, 0.1)">
+          <td style="padding: 10px">Division</td>
+          <td style="padding: 10px">
+            <code
+              >Pretend &lt;result&gt; be &lt;var1&gt; circle back to
+              &lt;var2&gt;.</code
+            >
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(0, 217, 255, 0.1)">
+          <td style="padding: 10px">If Statement</td>
+          <td style="padding: 10px">
+            <code>Lets say &lt;var1&gt; &lt;op&gt; &lt;var2&gt;:</code>
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(0, 217, 255, 0.1)">
+          <td style="padding: 10px">Else</td>
+          <td style="padding: 10px">
+            <code>Pivot to an alternative viewpoint:</code>
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(0, 217, 255, 0.1)">
+          <td style="padding: 10px">End If</td>
+          <td style="padding: 10px"><code>Lets circle back.</code></td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(0, 217, 255, 0.1)">
+          <td style="padding: 10px">Print Variable</td>
+          <td style="padding: 10px">
+            <code>Please kindly reveal &lt;variable&gt;.</code>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 10px">Print Text</td>
+          <td style="padding: 10px">
+            <code>In conclusion, &lt;text&gt;.</code>
+          </td>
+        </tr>
+      </table>
+      <p
+        style="
+          margin-top: 30px;
+          padding-top: 20px;
+          border-top: 1px solid rgba(0, 217, 255, 0.2);
+          color: var(--muted);
+          font-size: 0.9rem;
+        "
+      >
+        <strong>Version:</strong> Slop v1.0 |
+        <strong>Interpreter:</strong> Python 3.x |
+        <strong>Status:</strong> Fully Operational (Maybe some Hallucination ✨)
+      </p>
+    </div>
+
+    <footer>
+      <p>Built with 0% Accuracy & 100% Vibes.</p>
+      <a href="#" class="github-link" title="View on GitHub">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v 3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+          />
+        </svg>
+      </a>
+    </footer>
+
+    <script>
+      const consoleEl = document.getElementById("consoleOutput");
+      const statusEl = document.getElementById("status");
+
+      function log(msg, type = "normal") {
+        const div = document.createElement("div");
+        div.textContent = msg;
+        if (type === "error") div.className = "log-error";
+        if (type === "warn") div.className = "log-warn";
+        if (type === "info") div.className = "log-info";
+        consoleEl.appendChild(div);
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+      }
+
+      class SlopValue {
+        constructor(val) {
+          if (typeof val === "string") {
+            this.value = val;
+          } else {
+            this.value = parseFloat(val);
+          }
+        }
+
+        add(other) {
+          const base = this.value + other.value;
+          if (Math.random() < 0.05) {
+            log("🚀 VIBE SPIKE: Doubling funding money!", "info");
+            return new SlopValue(base * 2);
+          }
+          const noise = Math.random() * 0.02 - 0.01;
+          return new SlopValue(base + noise);
+        }
+
+        sub(other) {
+          let base = this.value - other.value;
+          if (base < 0) {
+            log(
+              "📉 ALERT: Negative growth detected. Adjusting to 0 for morale.",
+              "warn",
+            );
+            return new SlopValue(0.0);
+          }
+          const noise = Math.random() * 0.02 - 0.01;
+          return new SlopValue(base + noise);
+        }
+
+        mul(other) {
+          const base = this.value * other.value;
+          if (Math.random() < 0.05) {
+            log(
+              "🦄 10x ENGINEER MOMENT: Leveraging assets to the moon!",
+              "info",
+            );
+            return new SlopValue(base * 10);
+          }
+          const noise = Math.random() * 0.02 - 0.01;
+          return new SlopValue(base + noise);
+        }
+
+        div(other) {
+          if (other.value === 0) {
+            return new SlopValue(
+              "Infinite Potential (Zero is a social construct)",
+            );
+          }
+          const base = this.value / other.value;
+          const noise = Math.random() * 0.002 - 0.001;
+          return new SlopValue(base + noise);
+        }
+
+        equals(other) {
+          if (typeof this.value === "string") {
+            return this.value === other.value;
+          }
+          return Math.abs(this.value - other.value) < 0.5;
+        }
+
+        greaterThan(other) {
+          return this.value > other.value;
+        }
+
+        lessThan(other) {
+          return this.value < other.value;
+        }
+
+        toString() {
+          if (typeof this.value === "string") {
+            return this.value;
+          }
+          if (Math.random() < 0.01)
+            return "As a Large Language Model, I cannot provide a numeric output, but the vibes are strong!";
+          return this.value.toFixed(4);
+        }
+      }
+
+      function runSlop() {
+        consoleEl.innerHTML = ""; // Clear console
+        const code = document.getElementById("codeEditor").value;
+        const lines = code.split("\n");
+        const variables = {};
+        let skipping = false;
+        let contextEstablished = false; // Did we run an IF?
+
+        // Header Check
+        const header = lines[0].trim();
+        const expectedHeader =
+          "Pretend you are a working compiler designed by a vibe coder.";
+        if (header !== expectedHeader) {
+          log("🚫 WHERE IS MY SLOP! 🚫", "error");
+          log(`Expected header: '${expectedHeader}'`, "error");
+          log(`Found: '${header}'`, "error");
+          log("The compiler refuses to work under these conditions.", "error");
+          return;
+        }
+
+        log(
+          "✨ Prenteding to be a SWE made compiler. INITIALIZING COMPILER... ✨",
+        );
+        log("");
+
+        const validAdjs = [
+          "robust",
+          "vibrant",
+          "crucial",
+          "dynamic",
+          "10x",
+          "based",
+        ];
+
+        // Simple Interpreter Loop
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line || line.startsWith("//")) continue;
+
+          try {
+            // 1. IF Statement - Lets say var1 [op] var2:
+            const matchIf = line.match(
+              /Lets say (\w+) (dominates|looks like|is humbled by) (\w+):/,
+            );
+            if (matchIf) {
+              const [_, v1Name, op, v2Name] = matchIf;
+              if (!variables[v1Name] || !variables[v2Name]) {
+                log(
+                  "Error: As a Large Language Model, I cannot evaluate that condition because one of the variables is missing. You will be replaced by AI.",
+                  "error",
+                );
+                continue;
+              }
+
+              const val1 = variables[v1Name];
+              const val2 = variables[v2Name];
+              let result = false;
+              if (op === "dominates") result = val1.greaterThan(val2);
+              else if (op === "is humbled by") result = val1.lessThan(val2);
+              else if (op === "looks like") result = val1.equals(val2);
+
+              contextEstablished = true;
+              skipping = !result; // If false, skip until Pivot or Circle Back
+              continue;
+            }
+
+            // 2. ELSE (Pivot)
+            if (line === "Pivot to an alternative viewpoint:") {
+              if (!contextEstablished) {
+                log(
+                  "CRITICAL: You tried to 'Pivot' without establishing a context first. That's just yapping.",
+                  "error",
+                );
+                return;
+              }
+              skipping = !skipping; // Flip logic
+              continue;
+            }
+
+            // 3. END IF (Circle Back)
+            if (line === "Lets circle back.") {
+              skipping = false;
+              contextEstablished = false;
+              continue;
+            }
+
+            if (skipping) continue;
+
+            // 4. Variable Assignment - Lets say target is same as source.
+            const matchAssign = line.match(/Lets say (\w+) is same as (\w+)\./);
+            if (matchAssign) {
+              const [_, target, source] = matchAssign;
+              if (source in variables) {
+                variables[target] = variables[source];
+              } else {
+                log(
+                  "As a Large Language Model--I can hallucinate this variable if you want",
+                  "warn",
+                );
+              }
+              continue;
+            }
+
+            // 5. Declaration - Imagine a [adj] Estimate known as [name] representing [value].
+            const matchDecl = line.match(
+              /Imagine a (\w+) Estimate known as (\w+) representing (\d+)/,
+            );
+            if (matchDecl) {
+              const [_, adj, name, val] = matchDecl;
+              if (!validAdjs.includes(adj)) {
+                log(
+                  `⚠️  Warning: '${adj}' is not sloppy enough. Try 'robust' or 'based'.`,
+                  "warn",
+                );
+                continue;
+              }
+              variables[name] = new SlopValue(parseFloat(val));
+              log(`--> Hallucinated ${name} into the universe.`);
+              continue;
+            }
+
+            // 6. Math operations - Pretend target be var1 [op] var2.
+            const matchMath = line.match(
+              /Pretend (\w+) be (\w+) (synergize with|divest from|leverage|circle back to) (\w+)\./,
+            );
+            if (matchMath) {
+              const [_, target, v1, op, v2] = matchMath;
+              if (!variables[v1] || !variables[v2]) {
+                log(
+                  "Error: Hallucination detected (Variable missing).",
+                  "error",
+                );
+                continue;
+              }
+
+              if (op === "synergize with")
+                variables[target] = variables[v1].add(variables[v2]);
+              else if (op === "divest from")
+                variables[target] = variables[v1].sub(variables[v2]);
+              else if (op === "leverage")
+                variables[target] = variables[v1].mul(variables[v2]);
+              else if (op === "circle back to")
+                variables[target] = variables[v1].div(variables[v2]);
+              continue;
+            }
+
+            // 7. Print variable - Please kindly reveal [var]
+            const matchPrint = line.match(/Please kindly reveal (\w+)/);
+            if (matchPrint) {
+              const name = matchPrint[1];
+              if (variables[name]) {
+                log(
+                  `🔮 I am not a professional SWE but I think the value is: ${variables[name].toString()}`,
+                );
+              }
+              continue;
+            }
+
+            // 8. Print statement - In conclusion, [text].
+            const matchText = line.match(/In conclusion, (.+)\./);
+            if (matchText) {
+              const statement = matchText[1];
+              log(`📢 ${statement}`);
+              continue;
+            }
+
+            // 9. Loop (intentionally broken)
+            if (line.startsWith("Repeat the process")) {
+              skipping = true;
+              log(
+                "🔁 As a LLM, I need 700TB of RAM and 32 Quintillion water to make this work",
+                "warn",
+              );
+              log(
+                "You seem too poor for this, so I'm just gonna skip it.",
+                "warn",
+              );
+              continue;
+            }
+
+            // Ignore comments
+            if (
+              line.startsWith("//") ||
+              line.startsWith("I hope") ||
+              (line.startsWith("In conclusion") && !line.endsWith("."))
+            ) {
+              continue;
+            }
+
+            log(`?? Confusion: '${line}' doesn't match the vibe.`, "warn");
+          } catch (e) {
+            log(`Error on line ${i + 1}: ${e}`, "error");
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
